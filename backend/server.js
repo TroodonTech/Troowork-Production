@@ -21070,6 +21070,91 @@ app.get(securedpath + '/mob_workorderCreateByEmployeeBarcodeWorkorderType', func
         connection.release();
     });
 });
+// inspection changes starts by varun
+app.get(securedpath + '/mob_getPickValuesListForInspection', function (req, res) {
+    res.header("Access-Control-Allow-Origin", "*");
+
+    var orgID = url.parse(req.url, true).query['OrganizationID'];
+
+    pool.getConnection(function (err, connection) {
+        if (err) {
+
+            console.log("Failed! Connection with Database spicnspan via connection pool failed");
+        }
+        else {
+            console.log("Success! Connection with Database spicnspan via connection pool succeeded");
+            connection.query('set @orgID=?; call usp_mob_getPickValuesListForInspection(@orgID)', [orgID], function (err, rows) {
+                if (err) {
+                    console.log("Problem with MySQL" + err);
+                }
+                else {
+                    res.end(JSON.stringify(rows[1]));
+                }
+            });
+        }
+        connection.release();
+    });
+});
+
+app.get(securedpath + '/mob_createInspectionByScan', function (req, res) {
+    res.header("Access-Control-Allow-Origin", "*");
+
+    var barcode = url.parse(req.url, true).query['barcode'];
+    var TemplateID = url.parse(req.url, true).query['TemplateID'];
+    var SupervisorKey = url.parse(req.url, true).query['SupervisorKey'];
+    var EmployeeKey = url.parse(req.url, true).query['EmployeeKey'];
+    var time = url.parse(req.url, true).query['time'];
+    var metaUser = url.parse(req.url, true).query['metaUser'];
+    var OrganizationID = url.parse(req.url, true).query['OrganizationID'];
+
+    pool.getConnection(function (err, connection) {
+        if (err) {
+
+            console.log("Failed! Connection with Database spicnspan via connection pool failed");
+        }
+        else {
+            console.log("Success! Connection with Database spicnspan via connection pool succeeded");
+            connection.query('set @barcode=?; set@TemplateID=?; set@SupervisorKey=?; set@EmployeeKey=?; set@time=?; set@metaUser=?; set@OrganizationID=?; call usp_mob_createInspectionByScan(@barcode,@TemplateID,@SupervisorKey,@EmployeeKey,@time,@metaUser,@OrganizationID)', [barcode,TemplateID,SupervisorKey,EmployeeKey,time,metaUser,OrganizationID], function (err, rows) {
+                if (err) {
+                    console.log("Problem with MySQL" + err);
+                }
+                else {
+                    res.end(JSON.stringify(rows[7]));
+                }
+            });
+        }
+        connection.release();
+    });
+});
+// inspection changes ends by varun
+
+app.get(securedpath + '/mob_page_viewDashboardWorkorder_Ang6', function (req, res) {
+    res.header("Access-Control-Allow-Origin", "*");
+    var viewdate = url.parse(req.url, true).query['viewdate'];
+    var employeekey = url.parse(req.url, true).query['employeekey'];
+    var OrganizationID = url.parse(req.url, true).query['OrganizationID'];
+    var pageindex = url.parse(req.url, true).query['pageindex'];
+    pool.getConnection(function (err, connection) {
+        if (err) {
+
+            console.log("Failed! Connection with Database spicnspan via connection pool failed");
+        }
+        else {
+            console.log("Success! Connection with Database spicnspan via connection pool succeeded");
+            connection.query('set @employeekey=?; set @viewdate=?; set @OrganizationID=?; set @pageindex=?; call usp_mob_page_workordersGetByEmpKey_mobAng6(@employeekey,@viewdate,@OrganizationID,@pageindex)', [employeekey, viewdate, OrganizationID, pageindex], function (err, rows) {
+                if (err) {
+                    console.log("Problem with MySQL" + err);
+                }
+                else {
+
+                    res.end(JSON.stringify(rows[4]));
+                }
+            });
+        }
+        connection.release();
+    });
+});
+
 //handle generic exceptions
 //catch all other resource routes that are not defined above
 app.get(securedpath + '/*', function (req, res) {

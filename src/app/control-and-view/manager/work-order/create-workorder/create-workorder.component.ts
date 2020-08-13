@@ -488,6 +488,10 @@ export class CreateWorkorderComponent implements OnInit {
             alert("Provide entries for monthly recurring !");
             return;
           }
+          if (!(this.day1)) {
+            alert("Provide entries for monthly recurring !");
+            return;
+          }
         }
         if (this.monthlyreccradio2 == true) {
           if (!(this.day2) || !(this.pos2) || !(this.month2)) {
@@ -767,12 +771,12 @@ export class CreateWorkorderComponent implements OnInit {
         }
         if (this.monthlyreccradio1 == true) {
           this.occurs_on = this.day1;
-          this.rep_interval = (this.month1) ? parseInt(this.month1) + 1 : 1;
+          this.rep_interval = (this.month1) ? parseInt(this.month1) : 1;
         }
         else if (this.monthlyreccradio2 == true) {
 
           this.occurs_on = this.day2;
-          this.rep_interval = (this.month2) ? parseInt(this.month2) + 1 : 1;
+          this.rep_interval = (this.month2) ? parseInt(this.month2) : 1;
           this.occurs_type = this.pos2;
           switch (this.occurs_on) {
             case '0':
@@ -1249,11 +1253,11 @@ export class CreateWorkorderComponent implements OnInit {
         this.workTime = this.Time_monthly.getHours() + ':' + this.Time_monthly.getMinutes();
         if (this.monthlyreccradio1 == true) {
           this.occurs_on = this.day1;
-          this.rep_interval = (this.month1) ? parseInt(this.month1) + 1 : 1;
+          this.rep_interval = (this.month1) ? parseInt(this.month1) : 1;
         }
         else if (this.monthlyreccradio2 == true) {
           this.occurs_on = this.day2;
-          this.rep_interval = (this.month2) ? parseInt(this.month2) + 1 : 1;
+          this.rep_interval = (this.month2) ? parseInt(this.month2) : 1;
           this.occurs_type = this.pos2;
           switch (this.occurs_on) {
             case '0':
@@ -1615,11 +1619,11 @@ export class CreateWorkorderComponent implements OnInit {
       this.workTime = this.Time_monthly.getHours() + ':' + this.Time_monthly.getMinutes();
       if (this.monthlyreccradio1 == true) {
         this.occurs_on = this.day1;
-        this.rep_interval = (this.month1) ? parseInt(this.month1) + 1 : 1;
+        this.rep_interval = (this.month1) ? parseInt(this.month1) : 1;
       }
       else if (this.monthlyreccradio2 == true) {
         this.occurs_on = this.day2;
-        this.rep_interval = (this.month2) ? parseInt(this.month2) + 1 : 1;
+        this.rep_interval = (this.month2) ? parseInt(this.month2) : 1;
         this.occurs_type = this.pos2;
         switch (this.occurs_on) {
           case '0':
@@ -2018,12 +2022,12 @@ export class CreateWorkorderComponent implements OnInit {
       }
       if (this.monthlyreccradio1 == true) {
         this.occurs_on = this.day1;
-        this.rep_interval = (this.month1) ? parseInt(this.month1) + 1 : 1;
+        this.rep_interval = (this.month1) ? parseInt(this.month1) : 1;
       }
       else if (this.monthlyreccradio2 == true) {
 
         this.occurs_on = this.day2;
-        this.rep_interval = (this.month2) ? parseInt(this.month2) + 1 : 1;
+        this.rep_interval = (this.month2) ? parseInt(this.month2) : 1;
         this.occurs_type = this.pos2;
         switch (this.occurs_on) {
           case '0':
