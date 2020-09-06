@@ -5,7 +5,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { FileSelectDirective } from 'ng2-file-upload';
+import { FileUploadModule } from 'ng2-file-upload';
 import { CalendarModule } from 'primeng/calendar';
 import { NgDatepickerModule} from 'ng2-datepicker';
 
@@ -29,8 +29,9 @@ const routes: Routes = [
     NgDatepickerModule,
     FormsModule, ReactiveFormsModule,
     CalendarModule,
-    RouterModule.forChild(routes)
+    RouterModule.forChild(routes),
+    FileUploadModule
   ],
-  declarations: [ManagerinspectiontemplateComponent,FileSelectDirective]
+  declarations: [ManagerinspectiontemplateComponent]
 })
 export class ManagerinspectiontemplateModule { }

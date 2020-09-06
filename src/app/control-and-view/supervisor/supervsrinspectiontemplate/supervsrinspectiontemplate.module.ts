@@ -6,7 +6,7 @@ import { MDBBootstrapModule } from 'angular-bootstrap-md';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SupervisorDashboardModule } from '../../dashboard/user-dashboards/supervisor-dashboard/supervisor-dashboard.module';
 import { SupervsrinspectiontemplateComponent } from './supervsrinspectiontemplate.component';
-import { FileSelectDirective } from 'ng2-file-upload';
+import { FileUploadModule } from 'ng2-file-upload';
 import { NgDatepickerModule} from 'ng2-datepicker';
 const routes: Routes = [
   {
@@ -25,7 +25,8 @@ const routes: Routes = [
     NgDatepickerModule,
     FormsModule, ReactiveFormsModule,
     RouterModule.forChild(routes),
+    FileUploadModule
   ],
-  declarations: [SupervsrinspectiontemplateComponent, FileSelectDirective]
+  declarations: [SupervsrinspectiontemplateComponent]
 })
 export class SupervsrinspectiontemplateModule { }

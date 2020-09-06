@@ -568,15 +568,15 @@ export class CreateWorkorderComponent implements OnInit {
         // }
 
         if (roomlistObj) {
-          if (roomlistObj.length <= 50) {
+          if (roomlistObj.length <= 100) {
             for (var j = 0; j < roomlistObj.length; j++) {
               roomList.push(roomlistObj[j].RoomKey);
             }
             roomsString = roomList.join(',');
 
           }
-          else{
-            alert("Limit for the maximum workorders have reached. Maximum 50");
+          else {
+            alert("Limit for the maximum workorders have reached. Maximum 100");
             return;
           }
 
@@ -1112,15 +1112,15 @@ export class CreateWorkorderComponent implements OnInit {
         // }
 
         if (EquListObj) {
-          if (EquListObj.length <= 50) {
+          if (EquListObj.length <= 100) {
             for (var j = 0; j < EquListObj.length; j++) {
               equList.push(EquListObj[j].EquipmentKey);
             }
             this.eqp_key = equList.join(',');
 
           }
-          else{
-            alert("Limit for the maximum workorders have reached. Maximum 50");
+          else {
+            alert("Limit for the maximum workorders have reached. Maximum 100");
             return;
           }
 
@@ -1482,17 +1482,34 @@ export class CreateWorkorderComponent implements OnInit {
     if (this.EquipmentKey) {
       this.eqp_key = this.EquipmentKey;
     } else {
-      var k = confirm("100s of workorders will be created because an individual equipment has not been selected. Do you want to continue ?");
-      if (k) {
+      // var k = confirm("100s of workorders will be created because an individual equipment has not been selected. Do you want to continue ?");
+        // if (k) {
+        //   if (EquListObj) {
+        //     for (var j = 0; j < EquListObj.length; j++) {
+        //       equList.push(EquListObj[j].EquipmentKey);
+        //     }
+        //     this.eqp_key = equList.join(',');
+        //   }
+        // } else {
+        //   return;
+        // }
+
         if (EquListObj) {
-          for (var j = 0; j < EquListObj.length; j++) {
-            equList.push(EquListObj[j].EquipmentKey);
+          if (EquListObj.length <= 100) {
+            for (var j = 0; j < EquListObj.length; j++) {
+              equList.push(EquListObj[j].EquipmentKey);
+            }
+            this.eqp_key = equList.join(',');
+
           }
-          this.eqp_key = equList.join(',');
+          else {
+            alert("Limit for the maximum workorders have reached. Maximum 100");
+            return;
+          }
+
+        } else {
+          return;
         }
-      } else {
-        return;
-      }
     }
     if (this.EmployeeKey) {
       this.emp_key = this.EmployeeKey;
@@ -1824,16 +1841,33 @@ export class CreateWorkorderComponent implements OnInit {
     if (this.RoomKey) {
       roomsString = this.RoomKey;
     } else {
-      var k = confirm("100s of workorders will be created because an individual room has not been selected. Do you want to continue ?");
-      if (k) {
-        if (roomlistObj) {
+      // var k = confirm("100s of workorders will be created because an individual room has not been selected. Do you want to continue ?");
+      // if (k) {
+      //   if (roomlistObj) {
+      //     for (var j = 0; j < roomlistObj.length; j++) {
+      //       roomList.push(roomlistObj[j].RoomKey);
+      //     }
+      //     roomsString = roomList.join(',');
+      //   } else {
+      //     return;
+      //   }
+      // } else {
+      //   return;
+      // }
+
+      if (roomlistObj) {
+        if (roomlistObj.length <= 100) {
           for (var j = 0; j < roomlistObj.length; j++) {
             roomList.push(roomlistObj[j].RoomKey);
           }
           roomsString = roomList.join(',');
-        } else {
+
+        }
+        else {
+          alert("Limit for the maximum workorders have reached. Maximum 100");
           return;
         }
+
       } else {
         return;
       }

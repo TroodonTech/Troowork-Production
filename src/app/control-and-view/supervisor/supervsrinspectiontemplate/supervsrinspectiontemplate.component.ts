@@ -6,7 +6,7 @@ import { ConectionSettings } from '../../../service/ConnectionSetting';
 import { HttpClient } from '@angular/common/http';
 // import { ViewinspectionmanagerComponent } from "../../manager/inspection/viewinspectionmanager/viewinspectionmanager.component";
 import { DatepickerOptions } from 'ng2-datepicker';
-import { FileUploader, FileSelectDirective } from 'ng2-file-upload/ng2-file-upload';
+import { FileUploader } from 'ng2-file-upload/ng2-file-upload';
 const url = ConectionSettings.Url + '/inspection_Upload';
 
 @Component({
@@ -83,6 +83,9 @@ export class SupervsrinspectiontemplateComponent implements OnInit {
   rating = [];
   value;
   addUrl;
+
+
+  pickValues;
 
   setStar3(k, data: any) {
     this.rating[k] = data + 1;
@@ -175,6 +178,13 @@ export class SupervsrinspectiontemplateComponent implements OnInit {
       else if (this.viewEmpInspectionDetails[0].ScoreName === 'Pass/Fail') {
         this.names = ['Fail', 'N/A'];
         this.ScoreName = this.viewEmpInspectionDetails[0].ScoreName;
+      } else if (this.viewEmpInspectionDetails[0].ScoreName === '0-25') {
+        this.inspectionService.getPickListValues(this.OrganizationID).subscribe((data: any[]) => {
+          this.pickValues = data;
+        });
+        this.ScoreName = this.viewEmpInspectionDetails[0].ScoreName;
+      } else {
+        this.ScoreName = this.viewEmpInspectionDetails[0].ScoreName;
       }
       // else if(this.viewEmpInspectionDetails[0].ScoreName === '5 Star'){
       //   this.starList = [true,true,true,true,true]; 
@@ -216,6 +226,20 @@ export class SupervsrinspectiontemplateComponent implements OnInit {
     }
     else if (ScoreName === '3 Star') {
       this.Scoringtype.ratingValue.push({ rating: this.value, questionID: TemplateQuestionID });
+    } else if (ScoreName === '0-25') {
+      // var val=this.Scoringtype.rating_yn[TemplateQuestionID];
+      // this.Scoringtype.ratingValue.push({ rating: this.value, questionID: TemplateQuestionID });
+
+      var length = Object.keys(this.Scoringtype.rating_yn).length;
+      var arrayLength = this.Scoringtype.rating_yn.length;
+      var value = this.Scoringtype.rating_yn[arrayLength - 1];
+
+      // console.log(length);
+      // console.log(arrayLength);
+      // console.log(value);
+
+      this.Scoringtype.ratingValue.push({ rating: value, questionID: TemplateQuestionID });
+
     }
     console.log(this.Scoringtype);
   }
@@ -234,7 +258,7 @@ export class SupervsrinspectiontemplateComponent implements OnInit {
     var actionIndexList = [];
     var completeDateIndexList = [];
 
-    if (this.ScoreName === 'Yes/No' || this.ScoreName === 'Pass/Fail') {
+    if (this.ScoreName === 'Yes/No' || this.ScoreName === 'Pass/Fail' || this.ScoreName === '0-25') {
       for (var j = 0; j < this.val.length; j++) {
         temp.push("" + this.val[j].TemplateQuestionID);
       }
@@ -314,18 +338,27 @@ export class SupervsrinspectiontemplateComponent implements OnInit {
 
         }
 
-        for (var k = 0; k < ratingIndexlist.length; k++) {
-          if (ratingIndexlist[k] === questionid) {
-            this.lastIndexValue = this.lastIndex(ratingIndexlist, questionidList[i]);
-            console.log("last indexfor " + ratingIndexlist[k] + " is " + this.lastIndexValue);
+        // for (var k = 0; k < ratingIndexlist.length; k++) {
+        //   if (ratingIndexlist[k] === questionid) {
+        //     this.lastIndexValue = this.lastIndex(ratingIndexlist, questionidList[i]);
+        //     console.log("last indexfor " + ratingIndexlist[k] + " is " + this.lastIndexValue);
 
-            if (this.lastIndexValue !== null) {
-              questionValues = this.Scoringtype.ratingValue[this.lastIndexValue].rating;
-            } else {
-              questionValues = "Pass";
-            }
-            break;
+        //     if (this.lastIndexValue !== null) {
+        //       questionValues = this.Scoringtype.ratingValue[this.lastIndexValue].rating;
+        //     } else {
+        //       questionValues = "Pass";
+        //     }
+        //     break;
+        //   }
+        // }
+
+        if (this.Scoringtype.rating_yn[questionid]) {
+          questionValues = this.Scoringtype.rating_yn[questionid];
+          if (questionValues === 'undefined') {
+            questionValues = "Pass";
           }
+        } else {
+          questionValues = "Pass";
         }
 
         this.inspectionDetail =
@@ -456,18 +489,58 @@ export class SupervsrinspectiontemplateComponent implements OnInit {
             completedate = this.convert_DT(completedate);
           }
         }
-        for (k = 0; k < ratingIndexlist.length; k++) {
-          this.lastIndexValue = 0;
-          if (ratingIndexlist[k] === questionid) {
-            this.lastIndexValue = this.lastIndex(ratingIndexlist, questionidList[i]);
-            var x = this.lastIndexValue.length - ratingIndexlist.length;
-            if (this.lastIndexValue != null) {
-              questionValues = this.Scoringtype.ratingValue[this.lastIndexValue].rating;
+        // for (k = 0; k < ratingIndexlist.length; k++) {
+        //   this.lastIndexValue = 0;
+        //   if (ratingIndexlist[k] === questionid) {
+        //     this.lastIndexValue = this.lastIndex(ratingIndexlist, questionidList[i]);
+        //     var x = this.lastIndexValue.length - ratingIndexlist.length;
+        //     if (this.lastIndexValue != null) {
+        //       questionValues = this.Scoringtype.ratingValue[this.lastIndexValue].rating;
+        //     }
+        //     else {
+        //       questionValues = null;
+        //     }
+        //     break;
+        //   }
+        // }
+        if (this.ScoreName === '3 Star') {
+          for (k = 0; k < ratingIndexlist.length; k++) {
+            this.lastIndexValue = 0;
+            if (ratingIndexlist[k] === questionid) {
+              this.lastIndexValue = this.lastIndex(ratingIndexlist, questionidList[i]);
+              var x = this.lastIndexValue.length - ratingIndexlist.length;
+              if (this.lastIndexValue != null) {
+                questionValues = this.Scoringtype.ratingValue[this.lastIndexValue].rating;
+              }
+              else {
+                questionValues = null;
+              }
+              break;
             }
-            else {
-              questionValues = null;
+          }
+        }
+        else if (this.ScoreName === '5 Star') {
+          for (k = 0; k < ratingIndexlist.length; k++) {
+            this.lastIndexValue = 0;
+            if (ratingIndexlist[k] === questionid) {
+              this.lastIndexValue = this.lastIndex(ratingIndexlist, questionidList[i]);
+              var x = this.lastIndexValue.length - ratingIndexlist.length;
+              if (this.lastIndexValue != null) {
+                questionValues = this.Scoringtype.ratingValue[this.lastIndexValue].rating;
+              }
+              else {
+                questionValues = null;
+              }
+              break;
             }
-            break;
+          }
+        }
+        else {
+
+          if (this.Scoringtype.rating_yn[questionid]) {
+            questionValues = this.Scoringtype.rating_yn[questionid];
+          } else {
+            questionValues = null;
           }
         }
 

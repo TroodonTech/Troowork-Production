@@ -5,8 +5,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ConectionSettings } from '../../../../service/ConnectionSetting';
 import { HttpClient } from '@angular/common/http';
 import { Location } from '@angular/common';
-import { FileUploader, FileSelectDirective } from 'ng2-file-upload/ng2-file-upload';
 import { DatepickerOptions } from 'ng2-datepicker';
+import { FileUploader } from 'ng2-file-upload/ng2-file-upload';
 const url = ConectionSettings.Url + '/inspection_Upload';
 @Component({
   selector: 'app-managerinspectiontemplate',
@@ -42,7 +42,23 @@ export class ManagerinspectiontemplateComponent implements OnInit {
     }
     return window.atob(output);
   }
-
+  options: DatepickerOptions = {
+    minYear: 1970,
+    maxYear: 2030,
+    displayFormat: 'MM/DD/YYYY',
+    barTitleFormat: 'MMMM YYYY',
+    dayNamesFormat: 'dd',
+    firstCalendarDay: 0, // 0 - Sunday, 1 - Monday
+    //locale: frLocale,
+    //minDate: new Date(Date.now()), // Minimal selectable date
+    //maxDate: new Date(Date.now()),  // Maximal selectable date
+    barTitleIfEmpty: 'Click to select a date',
+    placeholder: 'Click to select a date', // HTML input placeholder attribute (default: '')
+    addClass: '', // Optional, value to pass on to [ngClass] on the input field
+    addStyle: { 'font-size': '18px', 'width': '100%', 'border': '1px solid #ced4da', 'border-radius': '0.25rem' }, // Optional, value to pass to [ngStyle] on the input field
+    fieldId: 'my-date-picker', // ID to assign to the input field. Defaults to datepicker-<counter>
+    useEmptyBarTitle: false, // Defaults to true. If set to false then barTitleIfEmpty will be disregarded and a date will always be shown 
+  };
   viewEmpInspectionDetails;
   inspKey$;
   names;
@@ -62,9 +78,9 @@ export class ManagerinspectiontemplateComponent implements OnInit {
   inspectionAssignEmp;
   addUrl;
 
-  // starList: boolean[];
+  pickValues;
+
   starList = [];
-  // rating: number;
   rating = [];
   value;
 
@@ -80,7 +96,6 @@ export class ManagerinspectiontemplateComponent implements OnInit {
       }
     }
   }
-
   setStar(k, data: any) {
     this.rating[k] = data + 1;
     this.value = this.rating[k];
@@ -132,25 +147,6 @@ export class ManagerinspectiontemplateComponent implements OnInit {
   count = 0;
   saveInspection = {};
 
-  options: DatepickerOptions = {
-    minYear: 1970,
-    maxYear: 2030,
-    displayFormat: 'MM/DD/YYYY',
-    barTitleFormat: 'MMMM YYYY',
-    dayNamesFormat: 'dd',
-    firstCalendarDay: 0, // 0 - Sunday, 1 - Monday
-    //locale: frLocale,
-    //minDate: new Date(Date.now()), // Minimal selectable date
-    //maxDate: new Date(Date.now()),  // Maximal selectable date
-    barTitleIfEmpty: 'Click to select a date',
-    placeholder: 'Click to select a date', // HTML input placeholder attribute (default: '')
-    addClass: '', // Optional, value to pass on to [ngClass] on the input field
-    addStyle: { 'font-size': '18px', 'width': '100%', 'border': '1px solid #ced4da', 'border-radius': '0.25rem' }, // Optional, value to pass to [ngStyle] on the input field
-    fieldId: 'my-date-picker', // ID to assign to the input field. Defaults to datepicker-<counter>
-    useEmptyBarTitle: false, // Defaults to true. If set to false then barTitleIfEmpty will be disregarded and a date will always be shown 
-  };
-
-
   constructor(private inspectionService: InspectionService, private route: ActivatedRoute, private router: Router, private _location: Location, private http: HttpClient) {
     this.route.params.subscribe(params => this.inspKey$ = params.InspectionOrderKey);
   }
@@ -166,20 +162,28 @@ export class ManagerinspectiontemplateComponent implements OnInit {
     this.employeekey = profile.employeekey;
     this.OrganizationID = profile.OrganizationID;
 
+
     this.inspectionService.InspectionDetails(this.inspKey$, this.OrganizationID).subscribe((data: any[]) => {
       this.viewEmpInspectionDetails = data;
       this.questionsCount = this.viewEmpInspectionDetails.length;
       this.val = data;
       this.inspectionAssignEmp = this.viewEmpInspectionDetails[0].employeeID;
       if (this.viewEmpInspectionDetails[0].ScoreName === 'Yes/No') {
-        this.names = ['Yes', 'No', 'N/A'];
+        this.names = ['Yes', 'No'];
         this.ScoreName = this.viewEmpInspectionDetails[0].ScoreName;
       }
       else if (this.viewEmpInspectionDetails[0].ScoreName === 'Pass/Fail') {
         this.names = ['Fail', 'N/A'];
         this.ScoreName = this.viewEmpInspectionDetails[0].ScoreName;
       }
-
+      else if (this.viewEmpInspectionDetails[0].ScoreName === '0-25') {
+        this.inspectionService.getPickListValues(this.OrganizationID).subscribe((data: any[]) => {
+          this.pickValues = data;
+        });
+        this.ScoreName = this.viewEmpInspectionDetails[0].ScoreName;
+      } else {
+        this.ScoreName = this.viewEmpInspectionDetails[0].ScoreName;
+      }
       this.Temp_templateId = this.viewEmpInspectionDetails[0].TemplateID;
       this.inspectionService
         .templateQuestionService(this.viewEmpInspectionDetails[0].TemplateID, this.OrganizationID).subscribe((data: any[]) => {
@@ -214,14 +218,20 @@ export class ManagerinspectiontemplateComponent implements OnInit {
     }
     else if (ScoreName === '3 Star') {
       this.Scoringtype.ratingValue.push({ rating: this.value, questionID: TemplateQuestionID });
+    } else if (ScoreName === '0-25') {
+
+      var length = Object.keys(this.Scoringtype.rating_yn).length;
+      var arrayLength = this.Scoringtype.rating_yn.length;
+      var value = this.Scoringtype.rating_yn[arrayLength - 1];
+
+      this.Scoringtype.ratingValue.push({ rating: value, questionID: TemplateQuestionID });
+
     }
     console.log(this.Scoringtype);
+
   }
   inspectionCompleted() {
     var temp = [];
-    var choices1 = [];
-    choices1[0] = this.Scoringtype;
-    console.log(choices1);
     var totalQuestions = this.questionsCount;
     var indexObj = [];
     var ratingIndexlist = [];
@@ -231,21 +241,20 @@ export class ManagerinspectiontemplateComponent implements OnInit {
     var actionIndexList = [];
     var completeDateIndexList = [];
 
-    if (this.ScoreName === 'Yes/No' || this.ScoreName === 'Pass/Fail') {
+    if (this.ScoreName === 'Yes/No' || this.ScoreName === 'Pass/Fail' || this.ScoreName === '0-25') {
       for (var j = 0; j < this.val.length; j++) {
         temp.push("" + this.val[j].TemplateQuestionID);
       }
       ratingIndexlist = Object.keys(this.Scoringtype.rating_yn);
       noteIndexList = Object.keys(this.Scoringtype.inspectionNotes);
       questionidList = this.arrayUnique(ratingIndexlist.concat(temp));
-
       observeIndexList = Object.keys(this.Scoringtype.ObservationDeficiency);
       actionIndexList = Object.keys(this.Scoringtype.CorrectiveAction);
       completeDateIndexList = Object.keys(this.Scoringtype.CompletedDate);
+
     }
     else {
       noteIndexList = Object.keys(this.Scoringtype.inspectionNotes);
-
       observeIndexList = Object.keys(this.Scoringtype.ObservationDeficiency);
       actionIndexList = Object.keys(this.Scoringtype.CorrectiveAction);
       completeDateIndexList = Object.keys(this.Scoringtype.CompletedDate);
@@ -264,7 +273,6 @@ export class ManagerinspectiontemplateComponent implements OnInit {
       var starRating = null;
       var notes = null;
       var questionid = null;
-
       var observe = null;
       var action = null;
       var completedate = null;
@@ -276,11 +284,9 @@ export class ManagerinspectiontemplateComponent implements OnInit {
       for (var i = i; i < questionidList.length; i++) {// includes actual qn ids
         questionValues = "Pass";
         notes = null;
-
         observe = null;
         action = null;
         completedate = null;
-
         questionid = questionidList[i];
         for (j = 0; j < noteIndexList.length; j++) {
           if (noteIndexList[j] === questionid) {
@@ -296,7 +302,6 @@ export class ManagerinspectiontemplateComponent implements OnInit {
             if (observe) {
               observe = observe.trim();
             }
-            //  break;
           }
 
           if (actionIndexList[j] === questionid) {
@@ -304,7 +309,6 @@ export class ManagerinspectiontemplateComponent implements OnInit {
             if (action) {
               action = action.trim();
             }
-            //  break;
           }
 
           if (completeDateIndexList[j] === questionid) {
@@ -313,18 +317,18 @@ export class ManagerinspectiontemplateComponent implements OnInit {
           }
         }
 
-        for (var k = 0; k < ratingIndexlist.length; k++) {
-          if (ratingIndexlist[k] === questionid) {
-            this.lastIndexValue = this.lastIndex(ratingIndexlist, questionidList[i]);
-            console.log("last indexfor " + ratingIndexlist[k] + " is " + this.lastIndexValue);
+        // for (var k = 0; k < ratingIndexlist.length; k++) {
+        //   if (ratingIndexlist[k] === questionid) {
+        //     this.lastIndexValue = this.lastIndex(ratingIndexlist, questionidList[i]);
+        // console.log("last indexfor " + ratingIndexlist[k] + " is " + this.lastIndexValue);
 
-            if (this.lastIndexValue !== null) {
-              questionValues = this.Scoringtype.ratingValue[this.lastIndexValue].rating;
-            } else {
-              questionValues = "Pass";
-            }
-            break;
+        if (this.Scoringtype.rating_yn[questionid]) {
+          questionValues = this.Scoringtype.rating_yn[questionid];
+          if (questionValues === 'undefined') {
+            questionValues = "Pass";
           }
+        } else {
+          questionValues = "Pass";
         }
 
         this.inspectionDetail =
@@ -340,9 +344,10 @@ export class ManagerinspectiontemplateComponent implements OnInit {
           ObservationDeficiency: observe,
           CorrectiveAction: action,
           CompletedDate: completedate,
+
         };
         this.inspectionService
-          .InspectionSaveService(this.inspectionDetail);
+          .InspectionSaveService(this.inspectionDetail)
       }
       this.inspectionDetail1 =
       {
@@ -399,7 +404,6 @@ export class ManagerinspectiontemplateComponent implements OnInit {
       var starRating = null;
       var notes = null;
       var questionid = null;
-
       var observe = null;
       var action = null;
       var completedate = null;
@@ -411,11 +415,9 @@ export class ManagerinspectiontemplateComponent implements OnInit {
       for (i = i; i < questionidList.length; i++) {// includes actual qn ids
         questionValues = null;
         notes = null;
-
         observe = null;
         action = null;
         completedate = null;
-
         questionid = questionidList[i];
         for (j = 0; j < noteIndexList.length; j++) {
           if (noteIndexList[j] === questionid) {
@@ -425,13 +427,12 @@ export class ManagerinspectiontemplateComponent implements OnInit {
             }
             // break;
           }
-
+          debugger;
           if (observeIndexList[j] === questionid) {
             observe = this.Scoringtype.ObservationDeficiency[questionid];
             if (observe) {
               observe = observe.trim();
             }
-            //     break;
           }
 
           if (actionIndexList[j] === questionid) {
@@ -439,31 +440,51 @@ export class ManagerinspectiontemplateComponent implements OnInit {
             if (action) {
               action = action.trim();
             }
-            //      break;
           }
 
           if (completeDateIndexList[j] === questionid) {
             completedate = this.Scoringtype.CompletedDate[questionid];
             completedate = this.convert_DT(completedate);
-            // if (completedate) {
-            //    completedate = completedate.trim();
-            //  }
-            //    break;
           }
         }
+        if (this.ScoreName === '3 Star') {
+          for (k = 0; k < ratingIndexlist.length; k++) {
+            this.lastIndexValue = 0;
+            if (ratingIndexlist[k] === questionid) {
+              this.lastIndexValue = this.lastIndex(ratingIndexlist, questionidList[i]);
+              var x = this.lastIndexValue.length - ratingIndexlist.length;
+              if (this.lastIndexValue != null) {
+                questionValues = this.Scoringtype.ratingValue[this.lastIndexValue].rating;
+              }
+              else {
+                questionValues = null;
+              }
+              break;
+            }
+          }
+        }
+        else if (this.ScoreName === '5 Star') {
+          for (k = 0; k < ratingIndexlist.length; k++) {
+            this.lastIndexValue = 0;
+            if (ratingIndexlist[k] === questionid) {
+              this.lastIndexValue = this.lastIndex(ratingIndexlist, questionidList[i]);
+              var x = this.lastIndexValue.length - ratingIndexlist.length;
+              if (this.lastIndexValue != null) {
+                questionValues = this.Scoringtype.ratingValue[this.lastIndexValue].rating;
+              }
+              else {
+                questionValues = null;
+              }
+              break;
+            }
+          }
+        }
+        else {
 
-        for (k = 0; k < ratingIndexlist.length; k++) {
-          this.lastIndexValue = 0;
-          if (ratingIndexlist[k] === questionid) {
-            this.lastIndexValue = this.lastIndex(ratingIndexlist, questionidList[i]);
-            var x = this.lastIndexValue.length - ratingIndexlist.length;
-            if (this.lastIndexValue != null) {
-              questionValues = this.Scoringtype.ratingValue[this.lastIndexValue].rating;
-            }
-            else {
-              questionValues = null;
-            }
-            break;
+          if (this.Scoringtype.rating_yn[questionid]) {
+            questionValues = this.Scoringtype.rating_yn[questionid];
+          } else {
+            questionValues = null;
           }
         }
 
@@ -483,7 +504,7 @@ export class ManagerinspectiontemplateComponent implements OnInit {
 
         };
         this.inspectionService
-          .InspectionSaveService(this.inspectionDetail);
+          .InspectionSaveService(this.inspectionDetail)
       }
       this.inspectionDetail1 =
       {

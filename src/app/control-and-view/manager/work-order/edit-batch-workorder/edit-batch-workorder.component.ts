@@ -104,6 +104,7 @@ export class EditBatchWorkorderComponent implements OnInit {
   EquipmentNameList;
   Times;
   RoomNameList;
+  RoomKeysList;
   role: String;
   name: String;
   employeekey: Number;
@@ -216,9 +217,18 @@ export class EditBatchWorkorderComponent implements OnInit {
         this.BatchScheduleNameKey = this.WOEditList.BatchScheduleNameKey;
         if (this.WOEditList.EquipmentKey == -1) {
           this.WorkOrderServiceService
-            .getRoomList(this.WOEditList.RoomKeyList, this.OrganizationID)
+            .getRoomList(this.WOEditList.WorkorderScheduleKey, this.OrganizationID)
             .subscribe((data: any[]) => {
-              this.RoomNameList = data[0].RoomText;
+
+              var rList = [];
+              var rkList = [];
+              for (var j = 0; j < data.length; j++) {
+                rList.push(data[j].RoomText);
+                rkList.push(data[j].RoomKeyText);
+              }
+              this.RoomKeysList = rList.join(',');
+              this.RoomNameList = rkList.join(',');
+
             });
         }
         //services for populating dropdown with floornames,zone names,roomtype names,room names,equipment names,schedule names
@@ -799,7 +809,7 @@ export class EditBatchWorkorderComponent implements OnInit {
       //   return;
       // }
       if (roomlistObj) {
-        if (roomlistObj.length <= 50) {
+        if (roomlistObj.length <= 100) {
           for (var j = 0; j < roomlistObj.length; j++) {
             roomList.push(roomlistObj[j].RoomKey);
           }
@@ -807,7 +817,7 @@ export class EditBatchWorkorderComponent implements OnInit {
 
         }
         else {
-          alert("Limit for the maximum Batch workorders have reached. Maximum 50");
+          alert("Limit for the maximum Batch workorders have reached. Maximum 100");
           return;
         }
 
@@ -1243,7 +1253,7 @@ export class EditBatchWorkorderComponent implements OnInit {
       //   this.eqp_key = equList.join(',');
       // }
       if (EquListObj) {
-        if (EquListObj.length <= 50) {
+        if (EquListObj.length <= 100) {
           for (var j = 0; j < EquListObj.length; j++) {
             equList.push(EquListObj[j].EquipmentKey);
           }
@@ -1251,7 +1261,7 @@ export class EditBatchWorkorderComponent implements OnInit {
 
         }
         else {
-          alert("Limit for the maximum batch workorders have reached. Maximum 50");
+          alert("Limit for the maximum batch workorders have reached. Maximum 100");
           return;
         }
 

@@ -251,9 +251,12 @@ export class InspectionService {
 
   }
   getInspectionOrderTablewithCurrentDatefrsprvsr(curr_date, toservempkey, orgid) {
+    // return this
+    //   .http
+    //   .get(ConectionSettings.Url + '/getSupervisorInspectionView?to_date=' + curr_date + '&employeekey=' + toservempkey + '&OrganizationID=' + orgid);
     return this
       .http
-      .get(ConectionSettings.Url + '/getSupervisorInspectionView?to_date=' + curr_date + '&employeekey=' + toservempkey + '&OrganizationID=' + orgid);
+      .get(ConectionSettings.Url + '/getSupervisorInspectionView_WEB?to_date=' + curr_date + '&employeekey=' + toservempkey + '&OrganizationID=' + orgid);
 
   }
   checkforTemplate(InspTempName, OrganizationID) {
@@ -371,5 +374,16 @@ export class InspectionService {
   }
 
   // @Rodney ends
+  getPickListValues(orgID) {
+    return this
+      .http
+      .get(ConectionSettings.Url + '/getPickValuesListForInspection?OrganizationID=' + orgID);
+  }
+  getTemplateNameForPicklistReport(empkey, orgID) {
+    return this
+      .http
+      .get(ConectionSettings.Url + '/getTemplateNameForPicklistReport?employeekey=' + empkey + '&OrganizationID=' + orgID);
+  }
+
 }
 

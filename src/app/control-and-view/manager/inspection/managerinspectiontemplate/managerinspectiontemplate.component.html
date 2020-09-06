@@ -131,7 +131,7 @@
           <div class="row col-md-12">
             <div class="col-md-6 ">
               <div class="form-group">
-                <a *ngFor="let x of  starList[i]; let j=index "
+                <a *ngFor="let x of  starList[i]; let j=index " class='btn'
                   (click)="setStar(i,j);saveRatings(item.TemplateQuestionID,item.ScoreName)">
                   <i *ngIf="x" class="fa fa-star-o"></i>
                   <i *ngIf="!x" class="fa fa-star"></i>
@@ -154,7 +154,7 @@
 
             <div class="col-md-6">
 
-              <div style="margin-top:-2% ;">
+              <div style="margin-top:5% ;">
                 <label style="margin-top: 2rem;">Corrective Action</label>
                 <textarea class="form-control rounded-1"
                   [(ngModel)]="Scoringtype.CorrectiveAction[item.TemplateQuestionID]" rows="3"></textarea>
@@ -217,7 +217,7 @@
           <div class="row col-md-12">
             <div class="col-md-6 ">
               <div class="form-group">
-                <a *ngFor="let x of starList[i]; let j=index "
+                <a *ngFor="let x of starList[i]; let j=index " class='btn'
                   (click)="setStar3(i,j);saveRatings(item.TemplateQuestionID,item.ScoreName)">
                   <i *ngIf="x" class="fa fa-star-o"></i>
                   <i *ngIf="!x" class="fa fa-star"></i>
@@ -238,7 +238,7 @@
             </div>
 
             <div class="col-md-6">
-              <div style="margin-top:-2% ;">
+              <div style="margin-top:5% ;">
                 <label style="margin-top: 2rem;">Corrective Action</label>
                 <textarea class="form-control rounded-1"
                   [(ngModel)]="Scoringtype.CorrectiveAction[item.TemplateQuestionID]" rows="3"></textarea>
@@ -290,6 +290,57 @@
         </div> -->
       </li>
 
+
+      <li class="col-sm-offset-4 col-sm-10" *ngIf="item.ScoreName ==='0-25'">
+        <div class="list inspectionPadding">
+          <span class="item-text-wrap">{{i + 1}}. {{item.Question}}</span>
+
+          <div class="row col-md-12" style="margin-top: 3rem;">
+            <div class="col-md-6 ">
+              <div class="form-group" style="margin-top: -1rem;">
+                <label style="margin-top: 2rem; margin-left: -1rem;" class="col-sm-3 col-md-3 col-lg-3 ">Score</label>
+                <select class="form-control col-sm-9 col-md-9 col-lg-9 "
+                  style="background-color: #d4f4ff !important;width: 100%;max-width: 150%;"
+                  [(ngModel)]='Scoringtype.rating_yn[item.TemplateQuestionID]'
+                  (change)="saveRatings(item.TemplateQuestionID,item.ScoreName)">
+                  <option value="">--Select--</option>
+                  <option *ngFor="let w of pickValues" [value]="w.picklistvalue">
+                    {{w.picklistvalue}}
+                  </option>
+                </select>
+              </div>
+
+              <div style="margin-top: -12%;">
+                <label style="margin-top: 3rem; ">Completed Date</label>
+                <ng-datepicker [options]="options" position="top-right"
+                  [(ngModel)]="Scoringtype.CompletedDate[item.TemplateQuestionID]"></ng-datepicker>
+              </div>
+
+
+              <div style="margin-top:3% ;">
+                <label>Corrective Action</label>
+                <textarea class="form-control rounded-1"
+                  [(ngModel)]="Scoringtype.CorrectiveAction[item.TemplateQuestionID]" rows="3"></textarea>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div>
+                <label style="margin-top: 1rem; margin-left: -1rem;" class="col-sm-3 col-md-3 col-lg-3 ">Notes</label>
+                <textarea class="form-control rounded-1" rows="5"
+                  [(ngModel)]="Scoringtype.inspectionNotes[item.TemplateQuestionID]"></textarea>
+              </div>
+
+              <div style="margin-top: -7%;">
+                <label style="margin-top: 2rem; ">Observation/Deficiency</label>
+                <textarea class="form-control rounded-1"
+                  [(ngModel)]="Scoringtype.ObservationDeficiency[item.TemplateQuestionID]" rows="3"></textarea>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </li>
 
 
     </ul>

@@ -571,7 +571,7 @@ export class CreateBatchWorkorderComponent implements OnInit {
       //   return;
       // }
       if (roomlistObj) {
-        if (roomlistObj.length <= 50) {
+        if (roomlistObj.length <= 100) {
           for (var j = 0; j < roomlistObj.length; j++) {
             roomList.push(roomlistObj[j].RoomKey);
           }
@@ -579,7 +579,7 @@ export class CreateBatchWorkorderComponent implements OnInit {
 
         }
         else {
-          alert("Limit for the maximum Batch workorders have reached. Maximum 50");
+          alert("Limit for the maximum Batch workorders have reached. Maximum 100");
           return;
         }
 
@@ -1080,7 +1080,7 @@ export class CreateBatchWorkorderComponent implements OnInit {
       //   this.eqp_key = equList.join(',');
       // }
       if (EquListObj) {
-        if (EquListObj.length <= 50) {
+        if (EquListObj.length <= 100) {
           for (var j = 0; j < EquListObj.length; j++) {
             equList.push(EquListObj[j].EquipmentKey);
           }
@@ -1088,7 +1088,7 @@ export class CreateBatchWorkorderComponent implements OnInit {
 
         }
         else{
-          alert("Limit for the maximum batch workorders have reached. Maximum 50");
+          alert("Limit for the maximum batch workorders have reached. Maximum 100");
           return;
         }
 
