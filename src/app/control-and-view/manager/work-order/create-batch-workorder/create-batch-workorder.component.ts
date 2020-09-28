@@ -107,7 +107,7 @@ export class CreateBatchWorkorderComponent implements OnInit {
   name: String;
   IsSupervisor: Number;
   employeekey;
-
+  rec1;
   //converting date from GMT to yyyy/mm/dd
   public convert_DT(str) {
     var date = new Date(str),

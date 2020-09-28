@@ -37,8 +37,8 @@ export class InspectiontemplateCreateComponent implements OnInit {
 
   scores: Inspection[];
   title = 'dynamicrow';
-  private fieldArray: Array<any> = [];
-  private newAttribute: any = {};
+  fieldArray: Array<any> = [];
+  ;newAttribute: any = {};
 
   constructor(private inspectionService: InspectionService) { }
 

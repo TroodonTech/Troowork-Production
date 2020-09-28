@@ -202,6 +202,7 @@ export class EditBatchWorkorderComponent implements OnInit {
     this.month1 = "";
     this.month2 = "";
     this.pos2 = "";
+    this.floorvalue=null;
     this.WorkOrderServiceService//for getting edit details for selected batchworkorder
       .getBatchWO_edit(this.BatchWO_Key, this.OrganizationID)
       .subscribe((data: any[]) => {
@@ -293,9 +294,10 @@ export class EditBatchWorkorderComponent implements OnInit {
           this.WorkOrderServiceService
             .getFloor_batch(this.BatchWO_Key, this.OrganizationID)
             .subscribe((data: any[]) => {
-
-              this.floorvalue = parseInt(data[0].FloorKeyList);
-              this.FloorKey = this.floorvalue;
+              // if (data.length > 0) {
+                this.floorvalue = parseInt(data[0].FloorKeyList);
+                this.FloorKey = this.floorvalue;
+              // }
               this.WorkOrderServiceService
                 .getallEquipment(this.WOEditList.FacilityKey, this.floorvalue, this.OrganizationID)
                 .subscribe((data: any[]) => {
@@ -1476,6 +1478,36 @@ export class EditBatchWorkorderComponent implements OnInit {
       this.marked = false;
     }
   }
+
+  toggleVisibility_Photo(e) {
+    if (e.target.checked) {
+      this.marked = true;
+    } else {
+      this.marked = false;
+    }
+  }
+
+  toggleVisibility_Barcode(e) {
+    if (e.target.checked) {
+      this.marked = true;
+    } else {
+      this.marked = false;
+    }
+  }
+
+  getEmployee(schedulename) {//for getting employee for selected schedulename
+    if (schedulename) {
+      this.WorkOrderServiceService
+        .getEmployee_scheduleNamae(schedulename, this.OrganizationID)
+        .subscribe((data: any[]) => {
+          this.EmployeeKey = data[0].EmployeeKey;
+        });
+    }
+    else {
+      this.EmployeeKey = "  ";
+    }
+  }
+
   goBack() {
     // this.router.navigate(['/ManagerDashBoard', { outlets: { ManagerOut: ['ViewBatchWorkorder'] } }]);
     if (this.role == 'Manager') {

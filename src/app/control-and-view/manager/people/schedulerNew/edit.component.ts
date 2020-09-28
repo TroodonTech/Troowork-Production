@@ -162,6 +162,7 @@ export class EditComponent implements OnInit {
 
   dateChangeNeeded() {
     this.DateEdit = this.convert_DT(this.DateEdit);
+    console.log("dateChangeNeeded... " + this.DateEdit);
   }
   
   submitEdit() {

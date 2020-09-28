@@ -8,7 +8,7 @@ import { DatepickerOptions } from 'ng2-datepicker';
 @Component({
   selector: 'scheduler-component',
   template: `
-  <div style="padding-left: 9rem;padding-right: 9rem;margin-top: 3%;margin-bottom: 3%;">
+  <div style="padding-left: 9rem;padding-right: 9rem;margin-top: 6%;margin-bottom: 3%;">
     <div class="row col-md-12 ">
       <h4 style="margin-left: 42%;margin-bottom:4%">EMPLOYEE SCHEDULER</h4>
     </div>
@@ -25,7 +25,7 @@ import { DatepickerOptions } from 'ng2-datepicker';
         <h3 style="text-align: right"></h3>
         <div class="form-group" style="width: 85%;">
           <label>View Range*</label>
-           <select [(ngModel)]="Range" (change)='ViewType();empCalendarActivities();' class="form-control col-sm-9 col-md-9 col-lg-9" [value]="value" style="background-color: #d4f4ff;">
+           <select [(ngModel)]="Range" (change)='ViewType();empCalendarActivities();' class="form-control col-sm-9 col-md-9 col-lg-9" style="background-color: #d4f4ff;">
            <!-- <option value="">--Select--</option> -->
               <!-- <option value="Daily">Daily</option>-->
               <option value="Week">Week</option>
@@ -49,6 +49,7 @@ import { DatepickerOptions } from 'ng2-datepicker';
             .header h1 a { text-decoration: none; }
             .header h1 { padding: 0px; margin: 0px; }
             .main { padding: 10px; margin-top: 10px; }
+            .bg-info { background-color: #FFFFFF !important; }
             
   `]
 })

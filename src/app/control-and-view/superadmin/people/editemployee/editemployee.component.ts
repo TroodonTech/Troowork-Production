@@ -344,18 +344,15 @@ export class EditemployeeComponent implements OnInit {
           this.remark = this.editempdtailsbysa.Remark;
         }
 
-        this.PeopleServiceService
-          .getDepartmentforddinSuperadmin(this.employeekey, this.editempdtailsbysa.OrganizationID)
-          .subscribe((data: People[]) => {
 
-            this.department = data;
-          });
-        this.PeopleServiceService
-          .getjobTitleforDropdowninSuperadmin(this.editempdtailsbysa.OrganizationID)
-          .subscribe((data: People[]) => {
+        this.PeopleServiceService.getJobTitleforadmindd(this.employeekey, this.OrganizationID).subscribe((data: People[]) => {
+          this.jobtitle = data;
+        });
+        this.PeopleServiceService.getDepartment(this.employeekey, this.OrganizationID).subscribe((data: People[]) => {
+          this.department = data;
+        });
 
-            this.jobtitle = data;
-          });
+
         this.PeopleServiceService
           .getManagerForEmployeeForSuperAdmin(this.editempdtailsbysa.OrganizationID)
           .subscribe((data: People[]) => {

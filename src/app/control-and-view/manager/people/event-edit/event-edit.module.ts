@@ -1,21 +1,22 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+
 import { Routes, RouterModule } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { IgxDatePickerModule } from 'igniteui-angular';
-import { NgDatepickerModule } from 'ng2-datepicker';
+import { CalendarModule } from 'primeng/calendar';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
-import { EmployeesDowntimeReportComponent } from './employees-downtime-report.component';
-import { ManagerDashBoardModule } from '../../../dashboard/user-dashboards/manager-dash-board/manager-dash-board.module';
-// import { ChartsModule } from 'ng2-charts';
+
+import {  EventEditComponent} from './event-edit.component';
+
 const routes: Routes = [
   {
     path: '',
-    component: EmployeesDowntimeReportComponent
+    component: EventEditComponent
   }
-
+  
 ];
 
 @NgModule({
@@ -23,14 +24,13 @@ const routes: Routes = [
     CommonModule,
     HttpClientModule,
     MDBBootstrapModule,
-    ManagerDashBoardModule,
-    FormsModule, ReactiveFormsModule,
+    FormsModule,
+    ReactiveFormsModule,
     IgxDatePickerModule,
-    NgDatepickerModule,
+    CalendarModule,
     NgMultiSelectDropDownModule.forRoot(),
-    RouterModule.forChild(routes),
-    // ChartsModule
+    RouterModule.forChild(routes)
   ],
-  declarations: [EmployeesDowntimeReportComponent]
+  declarations: [EventEditComponent]
 })
-export class EmployeesDowntimeReportModule { }
+export class EventEditModule { }
