@@ -10,15 +10,13 @@
   </div>
   <form [formGroup]="searchform">
     <div class="active-pink-3 active-pink-4 mb-4" style="margin-left: 1.5rem;margin-right: 1.5rem;">
-      <input class="form-control" name="searchjobtitleview" type="text" maxlength="20" specialIsAlphaNumeric minlength="3"
-        placeholder="Search Job-Title,Job-Title Description" aria-label="Search" [(ngModel)]="SearchJobTitle"
-        formControlName="SearchJobTitle" (input)="searchJobTitle($event.target.value);" style="width: 100%;">
+      <input class="form-control" name="searchjobtitleview" type="text" maxlength="20" specialIsAlphaNumeric minlength="3" placeholder="Search Job-Title,Job-Title Description" aria-label="Search" [(ngModel)]="SearchJobTitle" formControlName="SearchJobTitle" (input)="searchJobTitle($event.target.value);" style="width: 100%;">
       <div *ngIf="searchform.controls.SearchJobTitle.errors?.minlength">Minimum 3 characters required.</div>
     </div>
   </form>
 
   <div style="margin-left: 1.5rem;margin-right: 1.5rem;">
-    <table class="table table-responsive table-hover table-bordered table">
+    <table class="table table-responsive table-hover table-bordered table" style="display: inline-table;">
       <thead class="tableHead">
         <th> Job-Title </th>
         <th> Job-Title Description </th>
@@ -37,8 +35,7 @@
         <tr *ngIf="jobView?.length == 0">
           <td colspan="3" class="no-data-available">No records found</td>
         </tr>
-        <div mdbModal #basicModal="mdbModal" class="modal fade" role="dialog" aria-labelledby="myBasicModalLabel"
-          aria-hidden="true">
+        <div mdbModal #basicModal="mdbModal" class="modal fade" role="dialog" aria-labelledby="myBasicModalLabel" aria-hidden="true">
           <div class="modal-dialog" role="document">
             <div class="modal-content">
               <div class="modal-header">
@@ -51,10 +48,8 @@
                 Are you sure you want to delete this?
               </div>
               <div class="modal-footer">
-                <button type="button" mdbBtn color="secondary" class="waves-light" aria-label="Close" (click)="basicModal.hide(); deleteJobTitle()"
-                  mdbWavesEffect>Yes</button>
-                <button type="button" mdbBtn color="primary" class="relative waves-light" (click)="basicModal.hide()"
-                  mdbWavesEffect>No</button>
+                <button type="button" mdbBtn color="secondary" class="waves-light" aria-label="Close" (click)="basicModal.hide(); deleteJobTitle()" mdbWavesEffect>Yes</button>
+                <button type="button" mdbBtn color="primary" class="relative waves-light" (click)="basicModal.hide()" mdbWavesEffect>No</button>
               </div>
             </div>
           </div>

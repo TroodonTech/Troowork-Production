@@ -10,9 +10,6 @@ import { ModalDirective } from 'angular-bootstrap-md';
 import { DatepickerOptions } from 'ng2-datepicker';
 @Component({
   selector: 'scheduler-component',
-
-  // <div class="note">Cell Width: <input type="range" min="10" max="200" step="10" id="cellwidth" value="40"/> <span
-  // id="label">40</span></div>
   template: `
   <img *ngIf="loading" src="../../../../../assets/img/loader.gif" style="margin-left: 35rem; width: 20%" />
   <div *ngIf="!loading">
@@ -63,8 +60,8 @@ import { DatepickerOptions } from 'ng2-datepicker';
             <h3 style="text-align: right"></h3>
             <div class="form-group" style="width: 85%;">
                 <label for="eventsonly"><input type="checkbox" id="eventsonly" [ngModel]="filter.eventsOnly"
-                        (ngModelChange)="changeWithEvents($event)"> Only employees with events</label>
-                &nbsp;
+                        (ngModelChange)="changeWithEvents($event)"> Don't show employees without assignments</label>
+                <br>
                 <button (click)="clearFilter()">Clear</button>
                 &nbsp;
                 <button (click)="applyFilter()">Apply</button>
@@ -184,7 +181,7 @@ export class SchedulerComponent implements AfterViewInit {
             if (k) {
               this.loading = true;
               this.SchedulingService.deleteEmpFromEmpGroup(row.id, this.OrganizationID).subscribe((data: any[]) => {
-                alert("Employee removed from Employee Group successfully.....");
+                // alert("Employee removed from Employee Group successfully.....");
                 this.SchedulingService
                   .empCalendarDetails(this.Range, this.convert_DT(this.date), this.OrganizationID)
                   .subscribe((data: any[]) => {

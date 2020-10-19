@@ -19,8 +19,7 @@
       </div>
     </div>
     <div class="row col-md-12">
-      <button type="button" class="btn btn-success" style="margin-left: 47%"
-        (click)=generateInspectionReport(fromdate,todate)><b>GENERATE</b></button>
+      <button type="button" class="btn btn-success" style="margin-left: 47%" (click)=generateInspectionReport(fromdate,todate)><b>GENERATE</b></button>
       <br>
     </div>
   </div>
@@ -29,8 +28,7 @@
     <button type="button" class="btn btn-success" (click)="exportToExcel()"><b>EXPORT TO EXCEL</b></button>
   </div>
   <div style="margin-left: 1.5rem;margin-right: 1.5rem; width: 100%">
-    <table *ngIf='viewReport' id="reportexport" class="table table-hover table-responsive table-bordered table"
-      style="display: inline-table">
+    <table *ngIf='viewReport' id="reportexport" class="table table-hover table-responsive table-bordered table" style="display: inline-table">
       <thead class="tableHead">
         <th> DATE </th>
         <th> ROOM </th>
@@ -54,8 +52,7 @@
   <br>
 
   <div id='exportable1' style="visibility: hidden !important;">
-    <table *ngIf='viewReport' cellspacing="0" rules="rows" border="1"
-      style="color:Black;background-color:White;border-color:#CCCCCC;border-width:1px;border-style:None;width:100%;border-collapse:collapse;font-size:11pt;text-align:center;">
+    <table *ngIf='viewReport' cellspacing="0" rules="rows" border="1" style="color:Black;background-color:White;border-color:#CCCCCC;border-width:1px;border-style:None;width:100%;border-collapse:collapse;font-size:11pt;text-align:center;">
       <thead class="tableHead">
         <th> DATE </th>
         <th> ROOM </th>
