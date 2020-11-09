@@ -88,7 +88,7 @@ export class AdminChangePasswordComponent implements OnInit {
               subject: 'Login Credentials',
               text: message
             };
-            const url = ConectionSettings.Url+"/sendmail";
+            const url = ConectionSettings.Url + "/sendmail";
             return this.http.post(url, obj)
               .subscribe(res => console.log('Mail Sent Successfully...'));
           }
@@ -118,5 +118,15 @@ export class AdminChangePasswordComponent implements OnInit {
         this.UserLoginId = this.passDetails[0].UserLoginId;
       });
   }
+
+
+  charValidation(event: any) {
+    const patternChar = /[a-zA-Z 0-9~`!@#$%^&*()-_+=|}:;"',.?/{}]/;
+    let inputChar = String.fromCharCode(event.charCode);
+    if (event.keyCode != 8 && !patternChar.test(inputChar)) {
+      event.preventDefault();
+    }
+  }
+
 
 }

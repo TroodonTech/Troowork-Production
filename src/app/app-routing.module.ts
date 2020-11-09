@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
-import { CleaningDetailsModule } from './control-and-view/cleaning-details/cleaning-details.module';
+import { SupportPageModule } from './control-and-view/support-page/support-page.module';
 
 const routes: Routes = [
 
@@ -24,6 +24,10 @@ const routes: Routes = [
   {
     path: 'CleaningDetails/:Facility_Key/:Floor_Key/:Zone_Key/:RoomType_Key/:rev_orgid/:room_key',// cleaning details page
     loadChildren: './control-and-view/cleaning-details/cleaning-details.module#CleaningDetailsModule'
+  },
+  {
+    path: 'support',
+    loadChildren: './control-and-view/support-page/support-page.module#SupportPageModule'
   },
 ];
 
