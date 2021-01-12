@@ -10,8 +10,6 @@ import { Router, ActivatedRoute } from "@angular/router";
 })
 export class TradeRequestEditComponent implements OnInit {
 
-    ////////Author :  Aswathy//////
-    
   role: String;
   name: String;
   toServeremployeekey: Number;
@@ -88,13 +86,13 @@ export class TradeRequestEditComponent implements OnInit {
       }
     }
 
-    if (!(this.traderequestdetails.OtherEmployee)) {
+    if (!(this.traderequestdetails.OtherEmployeeKey)) {
       alert('Employee is not provided !');
       return;
     }
 
     var curr_date = this.convert_DT(new Date());
-    
+
     if (this.convert_DT(curr_date) > this.convert_DT(this.traderequestdetails.StartDate)) {
       alert("Start Date can't be less than Today...!");
       return;
@@ -107,11 +105,15 @@ export class TradeRequestEditComponent implements OnInit {
 
     var comments = this.traderequestdetails.Comments.trim();
 
-    this.PeopleServiceService.setEditedTradeRequest(curr_date, this.traderequestID$, this.traderequestdetails.OtherEmployee,
+    this.PeopleServiceService.setEditedTradeRequest(curr_date, this.traderequestID$, this.traderequestdetails.OtherEmployeeKey,
       this.convert_DT(this.traderequestdetails.StartDate), this.convert_DT(this.traderequestdetails.EndDate), comments).subscribe((data) => {
         this.traderequestdetails = data;
         alert('Trade Request Updated Successfully');
-        this.router.navigate(['/EmployeeDashboard', { outlets: { EmployeeOut: ['ViewTradeRequest'] } }]);
+        if (this.role == 'Employee') {
+          this.router.navigate(['/EmployeeDashboard', { outlets: { EmployeeOut: ['ViewTradeRequest'] } }]);
+        } else if (this.role == 'Supervisor') {
+          this.router.navigate(['/SupervisorDashboard', { outlets: { Superout: ['ViewTradeRequest'] } }]);
+        }
       });
   }
   ngOnInit() {
@@ -138,6 +140,10 @@ export class TradeRequestEditComponent implements OnInit {
   }
 
   goBack() {
-    this.router.navigate(['/EmployeeDashboard', { outlets: { EmployeeOut: ['ViewTradeRequest'] } }]);
+    if (this.role == 'Employee') {
+      this.router.navigate(['/EmployeeDashboard', { outlets: { EmployeeOut: ['ViewTradeRequest'] } }]);
+    } else if (this.role == 'Supervisor') {
+      this.router.navigate(['/SupervisorDashboard', { outlets: { Superout: ['ViewTradeRequest'] } }]);
+    }
   }
 }

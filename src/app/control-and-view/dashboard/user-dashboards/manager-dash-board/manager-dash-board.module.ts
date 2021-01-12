@@ -746,6 +746,13 @@ const routes: Routes = [
         outlet: 'ManagerOut',
         loadChildren: '../../../dashboard/manager-dashboard-pages/expired-assignments-details/expired-assignments-details.module#ExpiredAssignmentsDetailsModule'
       },
+
+      {
+        path: 'TradeRequestsFromEmployees/TradeRequestDetails/:requestID',
+        outlet: 'ManagerOut',
+        loadChildren: '../../../manager/people/trade-request-details/trade-request-details.module#TradeRequestDetailsModule',
+      },
+
     ]
   }
 ];

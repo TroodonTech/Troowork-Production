@@ -15635,7 +15635,7 @@ app.post(securedpath + '/getprofileimgapi', function (req, res) {
 
     var employeeKey = req.body.empid;
     var OrganisationId = req.body.orgid;
-    var imgid = req.body.imgid;
+    var imgid = 1;
     //var mDate = req.body.maintdate;
 
     pool.getConnection(function (err, connection) {
@@ -17080,7 +17080,7 @@ app.get(securedpath + '/getTradeRequestDetails', function (req, res) {
 app.get(securedpath + '/deleteTradeRequest', function (req, res) {
     res.header("Access-Control-Allow-Origin", "*");
     var deleteRequestKey = url.parse(req.url, true).query['deleteRequestKey'];
-    var employeeKey = url.parse(req.url, true).query['empKey'];
+    var employeeKey = url.parse(req.url, true).query['employeeKey'];
     pool.getConnection(function (err, connection) {
         if (err) {
 
@@ -17161,9 +17161,15 @@ app.post(securedpath + '/setEditedTradeRequest', supportCrossOriginScript, funct
     });
 });
 
-app.get(securedpath + '/getTradeRequestdetailsforManager', function (req, res) {
-    res.header("Access-Control-Allow-Origin", "*");
-    var OrganizationID = url.parse(req.url, true).query['OrganizationID'];
+app.post(securedpath + '/getTradeRequestdetailsforManager', supportCrossOriginScript, function (req, res) {
+
+    var newWOObj = req.body;
+    var OrganizationID = newWOObj.OrganizationID;
+    var employeekey = newWOObj.employeekey;
+    var fromdate = newWOObj.fromdate;
+    var todate = newWOObj.todate;
+    var TradeStatuses = newWOObj.TradeStatuses;
+
     pool.getConnection(function (err, connection) {
         if (err) {
 
@@ -17171,16 +17177,13 @@ app.get(securedpath + '/getTradeRequestdetailsforManager', function (req, res) {
         }
         else {
             console.log("Success! Connection with Database spicnspan via connection pool succeeded");
-            connection.query('set @OrganizationID=?;call usp_getTradeRequestdetailsforManager(@OrganizationID)', [OrganizationID], function (err, rows) {
+            connection.query('set @OrganizationID=?;set @employeekey=?;set @fromdate=?;set @todate=?;set @TradeStatuses=?;call usp_getTradeRequestdetailsforManager(@OrganizationID,@employeekey,@fromdate,@todate,@TradeStatuses)', [OrganizationID, employeekey, fromdate, todate, TradeStatuses], function (err, rows) {
                 if (err) {
                     console.log("Problem with MySQL" + err);
                 }
                 else {
 
-
-                    res.end(JSON.stringify(rows[1]));
-
-
+                    res.end(JSON.stringify(rows[5]));
                 }
             });
         }
@@ -20830,7 +20833,7 @@ app.post(securedpath + '/getCancelledWorkorderReport', supportCrossOriginScript,
         }
         else {
             console.log("Success! Connection with Database spicnspan via connection pool succeeded");
-            connection.query("set @facilityKey =?;set @floorKey =?;set @roomTypeKey =?;set @zoneKey =?;set @Fromdate=?; set @Todate=?;set @roomKey=?;set @employeeKey=?;set @metauser=?;set @OrgID=?; call usp_workorderCancelledReportByallFilters(@facilityKey,@floorKey,@roomTypeKey,@zoneKey,@Fromdate,@Todate,@roomKey,@employeeKey,@metauser,@OrgID)", [facilityKey, floorKey, roomTypeKey,zoneKey, Fromdate, Todate, roomKey, employeeKey, metauser, OrgID], function (err, rows) {
+            connection.query("set @facilityKey =?;set @floorKey =?;set @roomTypeKey =?;set @zoneKey =?;set @Fromdate=?; set @Todate=?;set @roomKey=?;set @employeeKey=?;set @metauser=?;set @OrgID=?; call usp_workorderCancelledReportByallFilters(@facilityKey,@floorKey,@roomTypeKey,@zoneKey,@Fromdate,@Todate,@roomKey,@employeeKey,@metauser,@OrgID)", [facilityKey, floorKey, roomTypeKey, zoneKey, Fromdate, Todate, roomKey, employeeKey, metauser, OrgID], function (err, rows) {
                 if (err) {
                     console.log("Problem with MySQL" + err);
                 }
@@ -21121,7 +21124,7 @@ app.get(securedpath + '/mob_createInspectionByScan', function (req, res) {
         }
         else {
             console.log("Success! Connection with Database spicnspan via connection pool succeeded");
-            connection.query('set @barcode=?; set@TemplateID=?; set@SupervisorKey=?; set@EmployeeKey=?; set@time=?; set@metaUser=?; set@OrganizationID=?; call usp_mob_createInspectionByScan(@barcode,@TemplateID,@SupervisorKey,@EmployeeKey,@time,@metaUser,@OrganizationID)', [barcode,TemplateID,SupervisorKey,EmployeeKey,time,metaUser,OrganizationID], function (err, rows) {
+            connection.query('set @barcode=?; set@TemplateID=?; set@SupervisorKey=?; set@EmployeeKey=?; set@time=?; set@metaUser=?; set@OrganizationID=?; call usp_mob_createInspectionByScan(@barcode,@TemplateID,@SupervisorKey,@EmployeeKey,@time,@metaUser,@OrganizationID)', [barcode, TemplateID, SupervisorKey, EmployeeKey, time, metaUser, OrganizationID], function (err, rows) {
                 if (err) {
                     console.log("Problem with MySQL" + err);
                 }
@@ -21637,7 +21640,786 @@ app.post(securedpath + '/mobsaveinspectedQuestions', supportCrossOriginScript, f
         connection.release();
     });
 });
-//
+
+// @Rodney starts...
+
+app.get(securedpath + '/employeesForScheduler_SuType_mob', function (req, res) {
+    res.header("Access-Control-Allow-Origin", "*");
+
+    var groupID = url.parse(req.url, true).query['groupID'];
+    var empkey = url.parse(req.url, true).query['empkey'];
+    var OrganizationID = url.parse(req.url, true).query['OrganizationID'];
+
+    pool.getConnection(function (err, connection) {
+        if (err) {
+
+            console.log("Failed! Connection with Database spicnspan via connection pool failed");
+        }
+        else {
+            console.log("Success! Connection with Database spicnspan via connection pool succeeded");
+            connection.query('set@groupID=?;set @empkey=?;set @OrganizationID=?; call usp_getEmployeesForScheduler_SuType_mob(@groupID,@empkey,@OrganizationID)', [groupID, empkey, OrganizationID], function (err, rows) {//IMPORTANT : (err,rows) this order matters.
+                if (err) {
+                    console.log("Problem with MySQL" + err);
+                }
+                else {
+                    res.end(JSON.stringify(rows[3]));
+                }
+            });
+        }
+        connection.release();
+    });
+});
+
+app.get(securedpath + '/employeeCalendarDetailsForScheduler_mob', function (req, res) {
+    res.header("Access-Control-Allow-Origin", "*");
+
+    var dateRange = url.parse(req.url, true).query['dateRange'];
+    var startDate = url.parse(req.url, true).query['startDate'];
+    var OrganizationID = url.parse(req.url, true).query['OrganizationID'];
+
+    pool.getConnection(function (err, connection) {
+        if (err) {
+
+            console.log("Failed! Connection with Database spicnspan via connection pool failed");
+        }
+        else {
+            console.log("Success! Connection with Database spicnspan via connection pool succeeded");
+            connection.query('set @startDate=?;set @dateRange=?;set @OrganizationID=?; call usp_getEmpDetailsFromEmpCalendar_mob(@startDate,@dateRange,@OrganizationID)', [startDate, dateRange, OrganizationID], function (err, rows) {//IMPORTANT : (err,rows) this order matters.
+                if (err) {
+                    console.log("Problem with MySQL" + err);
+                }
+                else {
+
+                    res.end(JSON.stringify(rows[3]));
+                }
+            });
+        }
+        connection.release();
+    });
+});
+
+app.post(securedpath + '/cancelPTORequest', supportCrossOriginScript, function (req, res) {
+
+    var todayDate = req.body.todayDate;
+    var ptorequestID = req.body.ptorequestID;
+    var EmpKey = req.body.EmpKey;
+    var OrgID = req.body.OrgID;
+    pool.getConnection(function (err, connection) {
+        if (err) {
+
+            console.log("Failed! Connection with Database spicnspan via connection pool failed");
+        }
+        else {
+            console.log("Success! Connection with Database spicnspan via connection pool succeeded");
+            connection.query("set @todayDate=?;set @ptorequestID=?;set @EmpKey=?;set @OrgID=?;call usp_cancelPTORequest(@todayDate,@ptorequestID,@EmpKey,@OrgID)", [todayDate, ptorequestID, EmpKey, OrgID], function (err, rows) {
+                if (err) {
+                    console.log("Problem with MySQL" + err);
+                }
+                else {
+
+                    res.end(JSON.stringify(rows[7]));
+                }
+            });
+        }
+        connection.release();
+    });
+});
+
+app.get(securedpath + '/employeesrowFiltering_mob', function (req, res) {
+    res.header("Access-Control-Allow-Origin", "*");
+
+    var groupID = url.parse(req.url, true).query['groupID'];
+    var searchtext = url.parse(req.url, true).query['searchtext'];
+    var range = url.parse(req.url, true).query['range'];
+    var todaydate = url.parse(req.url, true).query['todaydate'];
+    var OrganizationID = url.parse(req.url, true).query['OrganizationID'];
+
+    pool.getConnection(function (err, connection) {
+        if (err) {
+
+            console.log("Failed! Connection with Database spicnspan via connection pool failed");
+        }
+        else {
+            111
+            console.log("Success! Connection with Database spicnspan via connection pool succeeded");
+            connection.query('set@groupID=?;set @searchtext=?;set@range=?;set @todaydate=?;set @OrganizationID=?; call usp_getEmployeesForSchedulerWithrowFiltering_mob(@groupID,@searchtext,@range,@todaydate,@OrganizationID)', [groupID, searchtext, range, todaydate, OrganizationID], function (err, rows) {//IMPORTANT : (err,rows) this order matters.
+                if (err) {
+                    console.log("Problem with MySQL" + err);
+                }
+                else {
+                    res.end(JSON.stringify(rows[5]));
+                }
+            });
+        }
+        connection.release();
+    });
+});
+
+
+app.get(securedpath + '/employeesrowFiltering_group_mob', function (req, res) {
+    res.header("Access-Control-Allow-Origin", "*");
+
+    var groupID = url.parse(req.url, true).query['groupID'];
+    var searchtext = url.parse(req.url, true).query['searchtext'];
+    var range = url.parse(req.url, true).query['range'];
+    var todaydate = url.parse(req.url, true).query['todaydate'];
+    var OrganizationID = url.parse(req.url, true).query['OrganizationID'];
+
+    pool.getConnection(function (err, connection) {
+        if (err) {
+
+            console.log("Failed! Connection with Database spicnspan via connection pool failed");
+        }
+        else {
+            111
+            console.log("Success! Connection with Database spicnspan via connection pool succeeded");
+            connection.query('set@groupID=?;set @searchtext=?;set@range=?;set @todaydate=?;set @OrganizationID=?; call usp_getEmployeesForSchedulerWithrowFiltering_Group_mob(@groupID,@searchtext,@range,@todaydate,@OrganizationID)', [groupID, searchtext, range, todaydate, OrganizationID], function (err, rows) {//IMPORTANT : (err,rows) this order matters.
+                if (err) {
+                    console.log("Problem with MySQL" + err);
+                }
+                else {
+                    res.end(JSON.stringify(rows[5]));
+                }
+            });
+        }
+        connection.release();
+    });
+});
+
+
+app.post(securedpath + '/requestForTradeCancel', supportCrossOriginScript, function (req, res) {
+
+    var todayDate = req.body.todayDate;
+    var traderequestID = req.body.traderequestID;
+    var EmpKey = req.body.EmpKey;
+    pool.getConnection(function (err, connection) {
+        if (err) {
+
+            console.log("Failed! Connection with Database spicnspan via connection pool failed");
+        }
+        else {
+            console.log("Success! Connection with Database spicnspan via connection pool succeeded");
+            connection.query("set @todayDate=?;set @traderequestID=?;set @EmpKey=?;call usp_requestForTradeCancel(@todayDate,@traderequestID,@EmpKey)", [todayDate, traderequestID, EmpKey], function (err, rows) {
+                if (err) {
+                    console.log("Problem with MySQL" + err);
+                }
+                else {
+
+                    res.end(JSON.stringify(rows[3]));
+                }
+            });
+        }
+        connection.release();
+    });
+});
+
+
+app.post(securedpath + '/tradeCancelApprove', supportCrossOriginScript, function (req, res) {
+
+    var todayDate = req.body.todayDate;
+    var traderequestID = req.body.traderequestID;
+    var EmpKey = req.body.EmpKey;
+    pool.getConnection(function (err, connection) {
+        if (err) {
+
+            console.log("Failed! Connection with Database spicnspan via connection pool failed");
+        }
+        else {
+            console.log("Success! Connection with Database spicnspan via connection pool succeeded");
+            connection.query("set @todayDate=?;set @traderequestID=?;set @EmpKey=?;call usp_tradeCancelApprove(@todayDate,@traderequestID,@EmpKey)", [todayDate, traderequestID, EmpKey], function (err, rows) {
+                if (err) {
+                    console.log("Problem with MySQL" + err);
+                }
+                else {
+
+                    res.end(JSON.stringify(rows[3]));
+                }
+            });
+        }
+        connection.release();
+    });
+});
+
+
+app.get(securedpath + '/getTradeStatus', function (req, res) {
+    res.header("Access-Control-Allow-Origin", "*");
+
+    var OrganizationID = url.parse(req.url, true).query['orgID'];
+
+    pool.getConnection(function (err, connection) {
+        if (err) {
+
+            console.log("Failed! Connection with Database spicnspan via connection pool failed");
+        }
+        else {
+            console.log("Success! Connection with Database spicnspan via connection pool succeeded");
+            connection.query('set @OrganizationID=?; call usp_getTradeStatus(@OrganizationID)', [OrganizationID], function (err, rows) {//IMPORTANT : (err,rows) this order matters.
+                if (err) {
+                    console.log("Problem with MySQL" + err);
+                }
+                else {
+                    res.end(JSON.stringify(rows[1]));
+                }
+            });
+        }
+        connection.release();
+    });
+});
+
+app.get(securedpath + '/getEmployeeGroupsforscheduler_mob', function (req, res) {
+    res.header("Access-Control-Allow-Origin", "*");
+
+    var toServeremployeekey = url.parse(req.url, true).query['empkey'];
+    var OrganizationID = url.parse(req.url, true).query['OrgID'];
+
+    pool.getConnection(function (err, connection) {
+        if (err) {
+
+            console.log("Failed! Connection with Database spicnspan via connection pool failed");
+        }
+        else {
+            console.log("Success! Connection with Database spicnspan via connection pool succeeded");
+            connection.query('set @toServeremployeekey=?; set @OrganizationID=?; call usp_getEmployeeGroupsForScheduler_mob(@toServeremployeekey,@OrganizationID)', [toServeremployeekey, OrganizationID], function (err, rows) {
+                if (err) {
+                    console.log("Problem with MySQL" + err);
+                }
+                else {
+                    console.log("welcomeMessage...from server.." + JSON.stringify(rows[2]));
+                    res.end(JSON.stringify(rows[2]));
+                }
+            });
+        }
+        connection.release();
+    });
+});
+// PTO for mobile starts.
+
+
+app.get(securedpath + '/getPTORequestDetails_mob', function (req, res) {
+    res.header("Access-Control-Allow-Origin", "*");
+    var empKey = url.parse(req.url, true).query['employeekey'];
+    var OrganizationID = url.parse(req.url, true).query['OrganizationID'];
+    pool.getConnection(function (err, connection) {
+        if (err) {
+
+            console.log("Failed! Connection with Database spicnspan via connection pool failed");
+        }
+        else {
+            console.log("Success! Connection with Database spicnspan via connection pool succeeded");
+            connection.query('set @empKey=?;set @OrganizationID=?;call usp_mob_getPTORequestDetails(@empKey,@OrganizationID)', [empKey, OrganizationID], function (err, rows) {
+                if (err) {
+                    console.log("Problem with MySQL" + err);
+                }
+                else {
+
+
+                    res.end(JSON.stringify(rows[2]));
+
+
+                }
+            });
+        }
+        connection.release();
+    });
+});
+
+
+
+app.post(securedpath + '/savePTORequest_mob', supportCrossOriginScript, function (req, res) {
+
+    var currentdate = req.body.currentdate;
+    var employeekey = req.body.employeekey;
+    var OrganizationID = req.body.OrganizationID;
+    var startdate = req.body.startdate;
+    var enddate = req.body.enddate;
+    var comments = req.body.comments;
+    var reason = req.body.ptoreason;
+
+    pool.getConnection(function (err, connection) {
+        if (err) {
+
+            console.log("Failed! Connection with Database spicnspan via connection pool failed");
+        }
+        else {
+            console.log("Success! Connection with Database spicnspan via connection pool succeeded");
+            connection.query("set @currentdate=?;set @employeekey=?;set @OrganizationID=?;set @startdate=?;set @enddate=?;set @comments=?; set @reason=?; call usp_mob_SavePTORequest(@currentdate,@employeekey,@OrganizationID,@startdate,@enddate,@comments,@reason)", [currentdate, employeekey, OrganizationID, startdate, enddate, comments, reason], function (err, rows) {
+                if (err) {
+                    console.log("Problem with MySQL" + err);
+                }
+                else {
+
+                    res.end(JSON.stringify(rows[7]));
+                }
+            });
+        }
+        connection.release();
+    });
+});
+
+app.get(securedpath + '/getPTORequestDetailsforEmployee_mob', function (req, res) {
+    res.header("Access-Control-Allow-Origin", "*");
+    var ptorequestDetailsKey = url.parse(req.url, true).query['ptorequestDetails'];
+    pool.getConnection(function (err, connection) {
+        if (err) {
+
+            console.log("Failed! Connection with Database spicnspan via connection pool failed");
+        }
+        else {
+            console.log("Success! Connection with Database spicnspan via connection pool succeeded");
+            connection.query('set @ptorequestDetailsKey=?;call usp_mob_getPTORequestDetailsbyIDforEmployee(@ptorequestDetailsKey)', [ptorequestDetailsKey], function (err, rows) {
+                if (err) {
+                    console.log("Problem with MySQL" + err);
+                }
+                else {
+
+
+                    res.end(JSON.stringify(rows[1]));
+
+
+                }
+            });
+        }
+        connection.release();
+    });
+});
+
+
+app.post(securedpath + '/setEditedPTORequest_mob', supportCrossOriginScript, function (req, res) {
+
+    var currdate = req.body.currdate;
+    var ptorequestID = req.body.ptorequestID;
+    var StartDate = req.body.StartDate;
+    var EndDate = req.body.EndDate;
+    var Comments = req.body.Comments;
+    var reason = req.body.Reason;
+    var empKey = req.body.EmpKey;
+    pool.getConnection(function (err, connection) {
+        if (err) {
+
+            console.log("Failed! Connection with Database spicnspan via connection pool failed");
+        }
+        else {
+            console.log("Success! Connection with Database spicnspan via connection pool succeeded");
+            connection.query("set @currdate=?;set @ptorequestID=?;set @StartDate=?;set @EndDate=?;set @Comments=?;set @reason=?;set @empKey=?;call usp_mob_setEditedPTORequest(@currdate,@ptorequestID,@StartDate,@EndDate,@Comments,@reason,@empKey)", [currdate, ptorequestID, StartDate, EndDate, Comments, reason, empKey], function (err, rows) {
+                if (err) {
+                    console.log("Problem with MySQL" + err);
+                }
+                else {
+
+                    res.end(JSON.stringify(rows[7]));
+                }
+            });
+        }
+        connection.release();
+    });
+});
+
+
+app.post(securedpath + '/cancelPTORequest_mob', supportCrossOriginScript, function (req, res) {
+
+    var todayDate = req.body.todayDate;
+    var ptorequestID = req.body.ptorequestID;
+    var EmpKey = req.body.EmpKey;
+    var OrgID = req.body.OrgID;
+    pool.getConnection(function (err, connection) {
+        if (err) {
+
+            console.log("Failed! Connection with Database spicnspan via connection pool failed");
+        }
+        else {
+            console.log("Success! Connection with Database spicnspan via connection pool succeeded");
+            connection.query("set @todayDate=?;set @ptorequestID=?;set @EmpKey=?;set @OrgID=?;call usp_mob_cancelPTORequest(@todayDate,@ptorequestID,@EmpKey,@OrgID)", [todayDate, ptorequestID, EmpKey, OrgID], function (err, rows) {
+                if (err) {
+                    console.log("Problem with MySQL" + err);
+                }
+                else {
+
+                    res.end(JSON.stringify(rows[7]));
+                }
+            });
+        }
+        connection.release();
+    });
+});
+
+
+app.get(securedpath + '/deletePTORequest_mob', function (req, res) {
+    res.header("Access-Control-Allow-Origin", "*");
+    var deleteRequestKey = url.parse(req.url, true).query['deleteRequestKey'];
+    var OrganizationID = url.parse(req.url, true).query['OrganizationID'];
+    pool.getConnection(function (err, connection) {
+        if (err) {
+
+            console.log("Failed! Connection with Database spicnspan via connection pool failed");
+        }
+        else {
+            console.log("Success! Connection with Database spicnspan via connection pool succeeded");
+            connection.query('set @deleteRequestKey=?;set @OrganizationID=?; call usp_mob_deletePTORequest(@deleteRequestKey,@OrganizationID)', [deleteRequestKey, OrganizationID], function (err, rows) {
+                if (err) {
+                    console.log("Problem with MySQL" + err);
+                }
+                else {
+
+
+                    res.end(JSON.stringify(rows[1]));
+
+
+                }
+            });
+        }
+        connection.release();
+    });
+});
+
+// PTO for mobile ends.
+
+app.get(securedpath + '/employeesForSchedulerDropdown', function (req, res) {
+    res.header("Access-Control-Allow-Origin", "*");
+
+    var groupID = url.parse(req.url, true).query['groupID'];
+    var empkey = url.parse(req.url, true).query['empkey'];
+    var OrganizationID = url.parse(req.url, true).query['OrganizationID'];
+
+    pool.getConnection(function (err, connection) {
+        if (err) {
+
+            console.log("Failed! Connection with Database spicnspan via connection pool failed");
+        }
+        else {
+            console.log("Success! Connection with Database spicnspan via connection pool succeeded");
+            connection.query('set@groupID=?;set @empkey=?;set @OrganizationID=?; call usp_getEmployeesForSchedulerDropdown(@groupID,@empkey,@OrganizationID)', [groupID, empkey, OrganizationID], function (err, rows) {//IMPORTANT : (err,rows) this order matters.
+                if (err) {
+                    console.log("Problem with MySQL" + err);
+                }
+                else {
+                    res.end(JSON.stringify(rows[3]));
+                }
+            });
+        }
+        connection.release();
+    });
+});
+
+// trade starts
+
+
+app.get(securedpath + '/getAllEmployeeNames_SuType_mob', function (req, res) {
+    res.header("Access-Control-Allow-Origin", "*");
+    var OrganizationID = url.parse(req.url, true).query['OrganizationID'];
+    var employeekey = url.parse(req.url, true).query['employeekey'];
+    pool.getConnection(function (err, connection) {
+        if (err) {
+
+            console.log("Failed! Connection with Database spicnspan via connection pool failed");
+        }
+        else {
+            console.log("Success! Connection with Database spicnspan via connection pool succeeded");
+            connection.query('set @OrganizationID=?; set @employeekey=?; call usp_mob_getAllEmployeeNames_SuType(@OrganizationID,@employeekey)', [OrganizationID, employeekey], function (err, rows) {
+                if (err) {
+                    console.log("Problem with MySQL" + err);
+                }
+                else {
+
+
+                    res.end(JSON.stringify(rows[2]));
+
+
+                }
+            });
+        }
+        connection.release();
+    });
+});
+
+
+
+app.post(securedpath + '/saveTradeRequest_mob', supportCrossOriginScript, function (req, res) {
+
+    var currentdate = req.body.currentdate;
+    var toServeremployeekey = req.body.toServeremployeekey;
+    var OrganizationID = req.body.OrganizationID;
+    var EmployeeKey = req.body.EmployeeKey;
+    var startdate = req.body.startdate;
+    var enddate = req.body.enddate;
+    var comments = req.body.comments;
+
+    pool.getConnection(function (err, connection) {
+        if (err) {
+
+            console.log("Failed! Connection with Database spicnspan via connection pool failed");
+        }
+        else {
+            console.log("Success! Connection with Database spicnspan via connection pool succeeded");
+            connection.query("set @currentdate=?;set @toServeremployeekey=?;set @OrganizationID=?;set @EmployeeKey=?;set @startdate=?;set @enddate=?;set @comments=?; call usp_mob_SaveTradeRequest(@currentdate,@toServeremployeekey,@OrganizationID,@EmployeeKey,@startdate,@enddate,@comments)", [currentdate, toServeremployeekey, OrganizationID, EmployeeKey, startdate, enddate, comments], function (err, rows) {
+                if (err) {
+                    console.log("Problem with MySQL" + err);
+                }
+                else {
+
+                    res.end(JSON.stringify(rows[7]));
+                }
+            });
+        }
+        connection.release();
+    });
+});
+
+
+
+app.get(securedpath + '/getTradeRequestDetails_mob', function (req, res) {
+    res.header("Access-Control-Allow-Origin", "*");
+    var OrganizationID = url.parse(req.url, true).query['OrganizationID'];
+    var empKey = url.parse(req.url, true).query['employeekey'];
+    pool.getConnection(function (err, connection) {
+        if (err) {
+
+            console.log("Failed! Connection with Database spicnspan via connection pool failed");
+        }
+        else {
+            console.log("Success! Connection with Database spicnspan via connection pool succeeded");
+            connection.query('set @OrganizationID=?; set @empKey=?; call usp_mob_getTradeRequestDetails(@OrganizationID,@empKey)', [OrganizationID, empKey], function (err, rows) {
+                if (err) {
+                    console.log("Problem with MySQL" + err);
+                }
+                else {
+
+
+                    res.end(JSON.stringify(rows[2]));
+
+
+                }
+            });
+        }
+        connection.release();
+    });
+});
+
+
+
+
+app.get(securedpath + '/getTradeRequestInfoforEmployee_mob', function (req, res) {
+    res.header("Access-Control-Allow-Origin", "*");
+    var traderequestKey = url.parse(req.url, true).query['traderequestDetails'];
+    var OrganizationID = url.parse(req.url, true).query['OrganizationID'];
+    pool.getConnection(function (err, connection) {
+        if (err) {
+
+            console.log("Failed! Connection with Database spicnspan via connection pool failed");
+        }
+        else {
+            console.log("Success! Connection with Database spicnspan via connection pool succeeded");
+            connection.query('set @traderequestKey=?; set @OrganizationID=?; call usp_mob_getTradeRequestDetailsbyIDforEmployee(@traderequestKey,@OrganizationID)', [traderequestKey, OrganizationID], function (err, rows) {
+                if (err) {
+                    console.log("Problem with MySQL" + err);
+                }
+                else {
+
+
+                    res.end(JSON.stringify(rows[2]));
+
+
+                }
+            });
+        }
+        connection.release();
+    });
+});
+
+
+
+
+
+
+app.get(securedpath + '/getAssignmentTradebyID_mob', function (req, res) {
+    res.header("Access-Control-Allow-Origin", "*");
+    var traderequestID = url.parse(req.url, true).query['traderequestID'];
+    pool.getConnection(function (err, connection) {
+        if (err) {
+
+            console.log("Failed! Connection with Database spicnspan via connection pool failed");
+        }
+        else {
+            console.log("Success! Connection with Database spicnspan via connection pool succeeded");
+            connection.query('set @traderequestID=?;call usp_mob_getAssignmentTradebyID(@traderequestID)', [traderequestID], function (err, rows) {
+                if (err) {
+                    console.log("Problem with MySQL" + err);
+                }
+                else {
+
+
+                    res.end(JSON.stringify(rows[1]));
+
+
+                }
+            });
+        }
+        connection.release();
+    });
+});
+
+
+
+
+app.post(securedpath + '/setEditedTradeRequest_mob', supportCrossOriginScript, function (req, res) {
+
+    var currdate = req.body.currdate;
+    var traderequestID = req.body.traderequestID;
+    var OtherEmployee = req.body.OtherEmployee;
+    var StartDate = req.body.StartDate;
+    var EndDate = req.body.EndDate;
+    var Comments = req.body.Comments;
+
+    pool.getConnection(function (err, connection) {
+        if (err) {
+
+            console.log("Failed! Connection with Database spicnspan via connection pool failed");
+        }
+        else {
+            console.log("Success! Connection with Database spicnspan via connection pool succeeded");
+            connection.query("set @currdate=?;set @traderequestID=?; set@OtherEmployee=?; set @StartDate=?;set @EndDate=?;set @Comments=?;call usp_mob_setEditedTradeRequest(@currdate,@traderequestID,@OtherEmployee,@StartDate,@EndDate,@Comments)", [currdate, traderequestID, OtherEmployee, StartDate, EndDate, Comments], function (err, rows) {
+                if (err) {
+                    console.log("Problem with MySQL" + err);
+                }
+                else {
+
+                    res.end(JSON.stringify(rows[6]));
+                }
+            });
+        }
+        connection.release();
+    });
+});
+
+
+
+
+
+
+
+app.post(securedpath + '/requestForTradeCancel_mob', supportCrossOriginScript, function (req, res) {
+
+    var todayDate = req.body.todayDate;
+    var traderequestID = req.body.traderequestID;
+    var EmpKey = req.body.EmpKey;
+    pool.getConnection(function (err, connection) {
+        if (err) {
+
+            console.log("Failed! Connection with Database spicnspan via connection pool failed");
+        }
+        else {
+            console.log("Success! Connection with Database spicnspan via connection pool succeeded");
+            connection.query("set @todayDate=?;set @traderequestID=?;set @EmpKey=?;call usp_mob_requestForTradeCancel(@todayDate,@traderequestID,@EmpKey)", [todayDate, traderequestID, EmpKey], function (err, rows) {
+                if (err) {
+                    console.log("Problem with MySQL" + err);
+                }
+                else {
+
+                    res.end(JSON.stringify(rows[3]));
+                }
+            });
+        }
+        connection.release();
+    });
+});
+
+
+
+
+
+app.post(securedpath + '/tradeCancelApprove_mob', supportCrossOriginScript, function (req, res) {
+
+    var todayDate = req.body.todayDate;
+    var traderequestID = req.body.traderequestID;
+    var EmpKey = req.body.EmpKey;
+    pool.getConnection(function (err, connection) {
+        if (err) {
+
+            console.log("Failed! Connection with Database spicnspan via connection pool failed");
+        }
+        else {
+            console.log("Success! Connection with Database spicnspan via connection pool succeeded");
+            connection.query("set @todayDate=?;set @traderequestID=?;set @EmpKey=?;call usp_mob_tradeCancelApprove(@todayDate,@traderequestID,@EmpKey)", [todayDate, traderequestID, EmpKey], function (err, rows) {
+                if (err) {
+                    console.log("Problem with MySQL" + err);
+                }
+                else {
+
+                    res.end(JSON.stringify(rows[3]));
+                }
+            });
+        }
+        connection.release();
+    });
+});
+
+
+
+
+app.get(securedpath + '/deleteTradeRequest_mob', function (req, res) {
+    res.header("Access-Control-Allow-Origin", "*");
+    var deleteRequestKey = url.parse(req.url, true).query['deleteRequestKey'];
+    var employeeKey = url.parse(req.url, true).query['employeeKey'];
+    pool.getConnection(function (err, connection) {
+        if (err) {
+
+            console.log("Failed! Connection with Database spicnspan via connection pool failed");
+        }
+        else {
+            console.log("Success! Connection with Database spicnspan via connection pool succeeded");
+            connection.query('set @deleteRequestKey=?; set @employeeKey=?; call usp_mob_deleteTradeRequest(@deleteRequestKey,@employeeKey)', [deleteRequestKey, employeeKey], function (err, rows) {
+                if (err) {
+                    console.log("Problem with MySQL" + err);
+                }
+                else {
+
+
+                    res.end(JSON.stringify(rows[2]));
+
+
+                }
+            });
+        }
+        connection.release();
+    });
+});
+
+
+app.post(securedpath + '/saveTradeRequestAction_mob', supportCrossOriginScript, function (req, res) {
+
+    var tradeRequestID = req.body.tradeRequestID;
+    var employeekey = req.body.employeekey;
+    var statuscurrentdate = req.body.statuscurrentdate;
+    var approvedstartdate = req.body.approvedstartdate;
+    var ApprovedEndDate = req.body.ApprovedEndDate;
+    var StatusKey = req.body.StatusKey;
+    var statuscomments = req.body.statuscomments;
+
+    pool.getConnection(function (err, connection) {
+        if (err) {
+
+            console.log("Failed! Connection with Database spicnspan via connection pool failed");
+        }
+        else {
+            console.log("Success! Connection with Database spicnspan via connection pool succeeded");
+            connection.query("set @tradeRequestID=?;set @employeekey=?;set @statuscurrentdate=?;set @approvedstartdate=?;set @ApprovedEndDate=?;set @StatusKey=?;set @statuscomments=?; call usp_mob_saveTradeRequestAction(@tradeRequestID,@employeekey,@statuscurrentdate,@approvedstartdate,@ApprovedEndDate,@StatusKey,@statuscomments)", [tradeRequestID, employeekey, statuscurrentdate, approvedstartdate, ApprovedEndDate, StatusKey, statuscomments], function (err, rows) {
+                if (err) {
+                    console.log("Problem with MySQL" + err);
+                }
+                else {
+
+                    res.end(JSON.stringify(rows[7]));
+                }
+            });
+        }
+        connection.release();
+    });
+});
+
+
+// trade ends
+
+// @Rodney ends...
+
 //handle generic exceptions
 //catch all other resource routes that are not defined above
 app.get(securedpath + '/*', function (req, res) {

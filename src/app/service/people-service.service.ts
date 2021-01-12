@@ -1044,10 +1044,11 @@ export class PeopleServiceService {
     };
     return this.http.post(url, obj);
   }
-  getTradeRequestdetailsforManager(orgID) {
+  getTradeRequestdetailsforManager(tradeobj) {
+    const url = ConectionSettings.Url + '/getTradeRequestdetailsforManager';
     return this
       .http
-      .get(ConectionSettings.Url + '/getTradeRequestdetailsforManager?OrganizationID=' + orgID);
+      .post(url, tradeobj);
   }
   getTradeRequestdetailsbyID(traderequestID) {
     return this
@@ -1342,5 +1343,44 @@ export class PeopleServiceService {
       .get(ConectionSettings.Url + '/checkForDuplicateEventType?ActionType=' + ActionType + '&Action=' + Action + '&ActionTypeKey=' + ActionTypeKey +
         '&ActionKey=' + ActionKey + '&OrganizationID=' + OrganizationID);
 
+  }
+
+  cancelPTObyEmployee(ptorequestID$, empKey, orgID, curDate) {
+    const url = ConectionSettings.Url + "/cancelPTORequest";
+    const obj = {
+      todayDate: curDate,
+      ptorequestID: ptorequestID$,
+      EmpKey: empKey,
+      OrgID: orgID
+    };
+    return this.http.post(url, obj);
+  }
+
+  requestForTradeCancel(TradeRequestID, empKey, curDate) {
+    const url = ConectionSettings.Url + "/requestForTradeCancel";
+    const obj = {
+      todayDate: curDate,
+      traderequestID: TradeRequestID,
+      EmpKey: empKey
+    };
+    return this.http.post(url, obj);
+  }
+
+
+  tradeCancelApprove(TradeRequestID, empKey, curDate) {
+    const url = ConectionSettings.Url + "/tradeCancelApprove";
+    const obj = {
+      todayDate: curDate,
+      traderequestID: TradeRequestID,
+      EmpKey: empKey
+    };
+    return this.http.post(url, obj);
+  }
+
+
+  getTradeStatus(orgID) {
+    return this
+      .http
+      .get(ConectionSettings.Url + '/getTradeStatus?orgID=' + orgID);
   }
 }
